@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "WebSocket Chat";
+}
+
+<h3>WebSocket Chat</h3>
+
+<div>
+    <h4>Person 1</h4>
+    <input id="person1MessageInput" placeholder="Type a message" />
+    <button onclick="sendMessage('Person 1')">Send</button>
+</div>
+
+<div>
+    <h4>Person 2</h4>
+    <input id="person2MessageInput" placeholder="Type a message" />
+    <button onclick="sendMessage('Person 2')">Send</button>
+</div>
+
+<div>
+    <ul id="messagesList"></ul>
+</div>
+
+@section Scripts {
+    <script>
+        let socket;
+
+        function connectWebSocket() {
+            socket = new WebSocket('ws://localhost:8181');
+            socket.onopen = function (event) {
+                addMessage("Connected to server");
+            };
+
+            socket.onmessage = function (event) {
+                addMessage(event.data);
+            };
+
+            socket.onclose = function (event) {
+                addMessage("Disconnected from server");
+            };
+        }
+
+        function sendMessage(sender) {
+            const messageInput = sender === 'Person 1'
+                ? document.getElementById('person1MessageInput')
+                : document.getElementById('person2MessageInput');
+
+            const message = `${sender}: ${messageInput.value}`;
+            socket.send(message);
+            messageInput.value = '';
+        }
+
+        function addMessage(message) {
+            const messagesList = document.getElementById('messagesList');
+            const messageItem = document.createElement('li');
+            messageItem.textContent = message;
+            messagesList.appendChild(messageItem);
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            connectWebSocket();
+        });
+    </script>
+}

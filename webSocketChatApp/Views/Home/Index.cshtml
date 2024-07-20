@@ -1,0 +1,47 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>WebSocket MVC Application</p>
+    <input type="text" id="messageInput" placeholder="Type a message" />
+    <button onclick="sendMessage()">Send</button>
+
+    <ul id="messagesList"></ul>
+</div>
+
+@section Scripts {
+    <script>
+        let socket;
+
+        function connectWebSocket() {
+            socket = new WebSocket('ws://localhost:8181');
+            socket.onopen = function(event) {
+                console.log('Connected to WebSocket server.');
+            };
+
+            socket.onmessage = function(event) {
+                const messagesList = document.getElementById('messagesList');
+                const messageItem = document.createElement('li');
+                messageItem.textContent = event.data;
+                messagesList.appendChild(messageItem);
+            };
+
+            socket.onclose = function(event) {
+                console.log('Disconnected from WebSocket server.');
+            };
+        }
+
+        function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value;
+            socket.send(message);
+            messageInput.value = '';
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            connectWebSocket();
+        });
+    </script>
+}
