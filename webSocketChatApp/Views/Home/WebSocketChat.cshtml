@@ -5,15 +5,20 @@
 <h3>WebSocket Chat</h3>
 
 <div>
+    <button id="connectButton" onclick="connectWebSocket()">Connect</button>
+    <button id="disconnectButton" onclick="disconnectWebSocket()" disabled>Disconnect</button>
+</div>
+
+<div>
     <h4>Person 1</h4>
-    <input id="person1MessageInput" placeholder="Type a message" />
-    <button onclick="sendMessage('Person 1')">Send</button>
+    <input id="person1MessageInput" placeholder="Type a message" disabled />
+    <button id="sendPerson1Button" onclick="sendMessage('Person 1')" disabled>Send</button>
 </div>
 
 <div>
     <h4>Person 2</h4>
-    <input id="person2MessageInput" placeholder="Type a message" />
-    <button onclick="sendMessage('Person 2')">Send</button>
+    <input id="person2MessageInput" placeholder="Type a message" disabled />
+    <button id="sendPerson2Button" onclick="sendMessage('Person 2')" disabled>Send</button>
 </div>
 
 <div>
@@ -28,6 +33,12 @@
             socket = new WebSocket('ws://localhost:8181');
             socket.onopen = function (event) {
                 addMessage("Connected to server");
+                document.getElementById('disconnectButton').disabled = false;
+                document.getElementById('connectButton').disabled = true;
+                document.getElementById('person1MessageInput').disabled = false;
+                document.getElementById('sendPerson1Button').disabled = false;
+                document.getElementById('person2MessageInput').disabled = false;
+                document.getElementById('sendPerson2Button').disabled = false;
             };
 
             socket.onmessage = function (event) {
@@ -36,7 +47,19 @@
 
             socket.onclose = function (event) {
                 addMessage("Disconnected from server");
+                document.getElementById('disconnectButton').disabled = true;
+                document.getElementById('connectButton').disabled = false;
+                document.getElementById('person1MessageInput').disabled = true;
+                document.getElementById('sendPerson1Button').disabled = true;
+                document.getElementById('person2MessageInput').disabled = true;
+                document.getElementById('sendPerson2Button').disabled = true;
             };
+        }
+
+        function disconnectWebSocket() {
+            if (socket) {
+                socket.close();
+            }
         }
 
         function sendMessage(sender) {
@@ -55,9 +78,5 @@
             messageItem.textContent = message;
             messagesList.appendChild(messageItem);
         }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            connectWebSocket();
-        });
     </script>
 }
